@@ -1,0 +1,14 @@
+
+*.pyc
+*.o
+*.so
+*.c
+.cache
+*.egg-info
+*.sqlite3
+*.*~
+environment?.?.yml
+.DS_Store
+doc/.DS_Store
+doc/build
+invisible_cities/cities/.ipynb_checkpoints
