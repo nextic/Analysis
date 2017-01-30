@@ -36,6 +36,15 @@ https://www.git-tower.com/ seems a reasonable alternative. Otherwise, Just use m
 To make the magit experience even better, use
 `helm <https://emacs-helm.github.io/helm/>`_.
 
+To make installation of Magit and Helm easier for non-emacs users, we
+have prepared an `emacs init file
+<https://github.com/nextic/IC/blob/master/doc/init.el>`_ which
+installs both and sets some sensible defaults automatically. If you do
+not already have an emacs init file, then this file should be placed
+in your home directory under `.emacs.d/init.el`. If you *do* have an
+existing init file already, then we trust that you know what to do
+with the contents of this one.
+
 Read the docs
 ------------------
 
