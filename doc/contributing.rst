@@ -30,7 +30,7 @@ planet. Magit runs on emacs and we recommend it even if you use another editor. 
 
 You will enjoy and learn to understand git much more if you use magit (and besides, *it's free*)
 
-[If you use Mac OS or Windows and want to pay for a commercial product, While
+[If you use Mac OS or Windows and want to pay for a commercial product,
 https://www.git-tower.com/ seems a reasonable alternative. Otherwise, Just use magit.]
 
 To make the magit experience even better, use
