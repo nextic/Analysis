@@ -67,10 +67,12 @@ class Krypton:
         """
         PEAKS = []
         for peak, (t, E) in s12.items():
-            s12f[peak] = s12_features(s12, peak_number=peak)
-            E2 = E[np.where(E > threshold)]
-            if len(E2) < lmin or len(E2) > lmax:
+            sel = E > threshold
+            E2 = E[sel]
+            if not lmin < np.count_nonzero(sel) < lmax:
                 continue
+            s12[peak] = t[sel], E[sel]
+            s12f[peak] = s12_features(s12, peak_number=peak)
             PEAKS.append(peak)
 
         return PEAKS

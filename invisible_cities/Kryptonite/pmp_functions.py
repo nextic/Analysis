@@ -113,3 +113,11 @@ def kr_coordinates(xsipm, ysipm, Q, drift_time, drift_velocity):
     #z    = drift_time
     Q_tp = np.sum(Q)
     return KrCoordinates(Q=Q_tp, x=x, y=y, z=z, r=r, phi=phi)
+
+
+def integrate_charge(d):
+    """
+    Integrate charge from a SiPM dictionary.
+    """
+    newd = dict((key, np.sum(value)) for key, value in d.items())
+    return map(np.array, list(zip(*newd.items())))

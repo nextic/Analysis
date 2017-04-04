@@ -2,6 +2,9 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import LogNorm
 import numpy as np
 import functools
+import textwrap
+
+import invisible_cities.core.fit_functions as fitf
 
 def labels(xlabel, ylabel):
     """
@@ -100,7 +103,7 @@ def gausstext(values):
         $\mu$ = {:.1f}
         $\sigma$ = {:.2f}
         R = {:.3}%
-        Rbb = {:.3}%""".format(*f.values[1:], *reso(f.values)))
+        Rbb = {:.3}%""".format(*values[1:], *reso(values)))
 
 def save_to_folder(outputfolder, name):
     """
