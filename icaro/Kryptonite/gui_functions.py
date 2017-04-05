@@ -120,7 +120,8 @@ def fplot_signal_vs_time_mus(signal,
     ax1.set_ylim([signal_min, signal_max])
     set_plot_labels(xlabel = "t (mus)",
                     ylabel = "signal (pes/adc)")
-    plt.plot(signal_t, signal)
+    ax1.plot(signal_t, signal)
+    return fig
 
 
 def plot_signal_vs_time_mus(signal,
