@@ -316,6 +316,7 @@ class KrSelector(S12Selector, DSTCity):
                  S1_Hmin     = 0,
                  S1_Hmax     = np.inf,
 
+                 S2_Nmax     = 1,
                  S2_Emin     = 0,
                  S2_Emax     = np.inf,
                  S2_Lmin     = 0,
@@ -338,7 +339,7 @@ class KrSelector(S12Selector, DSTCity):
                              S1_Hmax     = S1_Hmax,
 
                              S2_Nmin     = 1,
-                             S2_Nmax     = 2,
+                             S2_Nmax     = S2_Nmax,
                              S2_Emin     = S2_Emin,
                              S2_Emax     = S2_Emax,
                              S2_Lmin     = S2_Lmin,
@@ -454,6 +455,7 @@ def KRYPTONITE(argv = sys.argv):
                             S1_Hmin     = CFP.S1_HMIN,
                             S1_Hmax     = CFP.S1_HMAX,
 
+                            S2_Nmax     = CFP.S2_NMAX,
                             S2_Emin     = CFP.S2_EMIN,
                             S2_Emax     = CFP.S2_EMAX,
                             S2_Lmin     = CFP.S2_LMIN,
