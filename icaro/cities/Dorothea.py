@@ -397,8 +397,10 @@ class KrSelector(S12Selector, DSTCity):
             if nevt_in > self.nprint:
                 self.nprint += self.nprint
                 print("Opening {}... {} events analyzed".format(filename, nevt_in))
-
-            S1s, S2s, S2Sis = pmp.load_pmaps(filename)
+            try:
+                S1s, S2s, S2Sis = pmp.load_pmaps(filename)
+            except:
+                print("##########", filename)
             with tb.open_file(filename, "r") as h5in:
                 event_numbers = h5in.root.Run.events.cols.evt_number[:]
                 timestamps    = h5in.root.Run.events.cols.timestamp [:]
