@@ -66,16 +66,21 @@ def load_lifetimes(filename, delimiter=" "):
                          "comment": _comment})
 """
 
+def datetime_to_str(datetime, tformat='%Y-%m-%d-%H:%M:%S'):
+    return datetime.strftime(tformat)
+
+
 def time_from_timestamp(timestamp, tformat='%Y-%m-%d-%H:%M:%S'):
     return datetime.datetime.fromtimestamp(timestamp).strftime(tformat)
 
 
 def str_to_datetime(timestamp, tformat='%Y-%m-%d-%H:%M:%S'):
-    return datetime.datetime.fromtimestamp(timestamp).strftime(tformat)
+    return datetime.datetime.strptime(timestamp, tformat)
 
 
 def to_deltatime(t0, t1, unit="s"):
     delta = pd.Timedelta(t1 - t0, unit=unit)
+    return delta
     return str(delta).replace(" ", "-")
 
 
