@@ -78,10 +78,9 @@ def str_to_datetime(timestamp, tformat='%Y-%m-%d-%H:%M:%S'):
     return datetime.datetime.strptime(timestamp, tformat)
 
 
-def to_deltatime(t0, t1, unit="s"):
+def to_deltatime(t0, t1, unit="s", to_str=False):
     delta = pd.Timedelta(t1 - t0, unit=unit)
-    return delta
-    return str(delta).replace(" ", "-")
+    return str(delta).replace(" ", "-") if to_str else delta
 
 
 def lifetime(dst, zrange=(25,530), Erange=(1e+3, 70e3), nbins=10):
