@@ -15,10 +15,10 @@ def delete_lifetime_entry(filename, run_number, delimiter=" ", overwrite=False):
     in_data          = open(filename, "r").readlines()
     header, *in_data = in_data
     out_data         = list(filter(lambda line: int(line.split()[0]) != run_number, in_data))
-    if len(in_data) == len(out_data) + 1 and not overwrite:
-        ans = input("Overwrite value for run {} (y/n)? ".format(run_number))
-        if ans != "y":
-            sys.exit(1)
+    if len(in_data) == len(out_data) + 1 and \
+       not overwrite and \
+       input("Overwrite value for run {} (y/n)? ".format(run_number)) != "y":
+        sys.exit(1)
     open(filename, "w").write(header + "".join(sorted(out_data)))
 
 
@@ -27,7 +27,8 @@ def save_lifetime(  filename,
                      t_start,    t_end,    dt,
                   date_start, date_end, ddate,
                   comment   = "" ,
-                  delimiter = " ", overwrite=False):
+                  delimiter = " ",
+                  overwrite = False):
     delete_lifetime_entry(filename, run_number, overwrite=overwrite)
     line = delimiter.join(map(str, [run_number,       lt,  u_lt,
                                        t_start,    t_end,    dt,
@@ -70,10 +71,10 @@ def lifetime(dst, zrange=(25,530), Erange=(1e+3, 70e3), nbins=10):
     indx  = int(len(dst) / nbins)
     print('bin length = {}'.format(indx))
 
-    CHI2 = []
-    LAMBDA = []
+    CHI2    = []
+    LAMBDA  = []
     ELAMBDA = []
-    TSTAMP = []
+    TSTAMP  = []
 
     for i in range(nbins):
         k0 = i * indx
@@ -128,17 +129,17 @@ def lifetime_vs_t(dst, nslices=10, nbins=10, seed=(3e4, -5e2), timestamps=None, 
 
 class MapXY:
     def __init__(self, x, y, E):
-        self.xs = x.reshape(x.size, 1) #file to column vector
-        self.ys = y.reshape(y.size, 1)
+        self.xs   = x.reshape(x.size, 1) #file to column vector
+        self.ys   = y.reshape(y.size, 1)
         self.eref = E[E.shape[0]//2, E.shape[1]//2]
-        self.es = E
+        self.es   = E
         print('reference energy = {}'.format(self.eref))
 
     def xycorr(self, x, y):
-        x_closest = np.apply_along_axis(np.argmin, 0, abs(x - self.xs))
-        y_closest = np.apply_along_axis(np.argmin, 0, abs(y - self.ys))
-        e = self.es[x_closest, y_closest]
-        e[ e < 1e3] = self.eref
+        x_closest  = np.apply_along_axis(np.argmin, 0, abs(x - self.xs))
+        y_closest  = np.apply_along_axis(np.argmin, 0, abs(y - self.ys))
+        e          = self.es[x_closest, y_closest]
+        e[e < 1e3] = self.eref
         return self.eref / e
 
 
@@ -154,18 +155,17 @@ def event_rate(kdst):
 
 
 def profile_and_fit(X, Y, xrange, yrange, nbins, fitpar, label, fitOpt  = "r"):
-    xe = 0.5*(xrange[1] - xrange[0])/nbins
-
     n_it = 0
     chi2 = 0
     while not 0.8 < chi2 < 1.4:
-        x, y, sy = fitf.profileX(X, Y, nbins=nbins,
-                                 xrange=xrange, yrange=yrange, drop_nan=True)
-        sel  = fitf.in_range(x, xrange[0], xrange[1])
+        xe       = 0.5*(xrange[1] - xrange[0])/nbins
+        x, y, sy = fitf.profileX(X, Y, nbins=nbins, xrange=xrange, yrange=yrange)
+        sel      = fitf.in_range(x, *xrange)
         x, y, sy = x[sel], y[sel], sy[sel]
-        f     = fitf.fit(fitf.expo, x, y, fitpar, sigma=sy)
-        chi2  = f.chi2
-        nbins = 50 - n_it
+        f        = fitf.fit(fitf.expo, x, y, fitpar, sigma=sy)
+        chi2     = f.chi2
+        nbins    = 50 - n_it
+
         n_it += 1
         if nbins < 5:
             print("Chi2 does not get close to 1")
@@ -178,15 +178,12 @@ def profile_and_fit(X, Y, xrange, yrange, nbins, fitpar, label, fitOpt  = "r"):
     return f, x, y, sy
 
 
-def profile_and_fit_radial(X, Y, xrange, yrange, nbins, fitpar, label):
-    fitOpt  = "r"
-    xe = (xrange[1] - xrange[0])/nbins
-
-    x, y, sy = fitf.profileX(X, Y, nbins=nbins,
-                             xrange=xrange, yrange=yrange, drop_nan=True)
-    sel  = fitf.in_range(x, xrange[0], xrange[1])
+def profile_and_fit_radial(X, Y, xrange, yrange, nbins, fitpar, label, fitOpt="r"):
+    xe       = (xrange[1] - xrange[0])/nbins
+    x, y, sy = fitf.profileX(X, Y, nbins=nbins, xrange=xrange, yrange=yrange)
+    sel      = fitf.in_range(x, *xrange)
     x, y, sy = x[sel], y[sel], sy[sel]
-    f = fitf.fit(fitf.polynom, x, y, fitpar, sigma=sy)
+    f        = fitf.fit(fitf.polynom, x, y, fitpar, sigma=sy)
 
     plt.errorbar(x=x, xerr=xe, y=y, yerr=sy,
                  linestyle='none', marker='.')
