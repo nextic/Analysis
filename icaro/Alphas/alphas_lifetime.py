@@ -49,7 +49,8 @@ overwrite     = flags.overwrite
 def savefig(name, run_number):
     folder = plots_folder + "/" + str(run_number)
     if not save_plots: return
-    if not os.path.exists(folder): os.mkdir(folder)
+    if not os.path.exists(plots_folder): os.mkdir(plots_folder)
+    if not os.path.exists(      folder): os.mkdir(      folder)
     plt.savefig(folder + "/" + name + ".png")
 
 for run_number in run_numbers:
@@ -215,12 +216,13 @@ for run_number in run_numbers:
     zrange =  50, 400
     Erange = 1e3, 7e4
     nbins  = 50
+    seed   = Erange[1], np.log(Erange[0]/Erange[1])/zrange[1]
     plt.figure()
     F, x, y, sy = profile_and_fit(fid.Z, fid.S2e, 
                                   xrange = zrange, 
                                   yrange = Erange, 
                                   nbins  = nbins, 
-                                  fitpar = (50000,-300),
+                                  fitpar = seed,
                                   label  = ("Drift time ($\mu$s)", "S2 energy (pes)"))
     savefig("LifetimeFit", run_number)
 
