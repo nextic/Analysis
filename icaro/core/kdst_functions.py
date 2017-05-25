@@ -16,7 +16,7 @@ def delete_lifetime_entry(filename, run_number, delimiter=" "):
     header, *in_data = in_data
     out_data         = list(filter(lambda line: int(line.split()[0]) != run_number, in_data))
     if len(in_data) == len(out_data) + 1:
-        ans = input("Overwrite value for run {} (y/n)? ")
+        ans = input("Overwrite value for run {} (y/n)? ".format(run_number))
         if ans != "y":
             sys.exit(1)
     open(filename, "w").write(header + "".join(sorted(out_data)))
@@ -39,32 +39,6 @@ def save_lifetime(  filename,
 def load_lifetimes(filename, delimiter=" "):
     return pd.read_csv(filename, sep=delimiter)
 
-
-"""
-    _run, _lt, _u_lt, _t_start, _t_end, _dt, _date_start, _date_end, _ddate, _comment = ([] for i in range(10))
-    data  = [[] for i in range(10)]
-    type_ = [int, float, float, float, float, float, str, str, str, str]
-    for i, line in enumerate(open(filename)):
-        if not i: continue
-        for j, in 
-        run, lt, u_lt, t_start, t_end, dt, date_start, date_end, ddate, *comment = line.split(delimiter)
-
-        _run     .append(  int( run    ))
-        _lt      .append(float(  lt    ))
-        _u_lt    .append(float(u_lt    ))
-        _t_start .append(float(t_start ))
-        _t_end   .append(float(dt      ))
-        _t_dt    .append(float(t_end   ))
-        _date    .append(  str(date    ))
-        _duration.append(
-        _comment .append(" ".join(comment))
-    return pd.DataFrame({"run"    : _run    ,
-                         "LT"     : _lt     ,
-                         "LTu"    : _u_lt   ,
-                         "time"   : _time   ,
-                         "date"   : _date   ,
-                         "comment": _comment})
-"""
 
 def datetime_to_str(datetime, tformat='%Y-%m-%d-%H:%M:%S'):
     return datetime.strftime(tformat)
@@ -182,11 +156,20 @@ def event_rate(kdst):
 def profile_and_fit(X, Y, xrange, yrange, nbins, fitpar, label, fitOpt  = "r"):
     xe = 0.5*(xrange[1] - xrange[0])/nbins
 
-    x, y, sy = fitf.profileX(X, Y, nbins=nbins,
-                             xrange=xrange, yrange=yrange, drop_nan=True)
-    sel  = fitf.in_range(x, xrange[0], xrange[1])
-    x, y, sy = x[sel], y[sel], sy[sel]
-    f = fitf.fit(fitf.expo, x, y, fitpar, sigma=sy)
+    n_it = 0
+    chi2 = 0
+    while not 0.8 < chi2 < 1.4:
+        x, y, sy = fitf.profileX(X, Y, nbins=nbins,
+                                 xrange=xrange, yrange=yrange, drop_nan=True)
+        sel  = fitf.in_range(x, xrange[0], xrange[1])
+        x, y, sy = x[sel], y[sel], sy[sel]
+        f     = fitf.fit(fitf.expo, x, y, fitpar, sigma=sy)
+        chi2  = f.chi2
+        nbins = 50 - n_it
+        n_it += 1
+        if nbins < 5:
+            print("Chi2 does not get close to 1")
+            break
 
     plt.errorbar(x=x, xerr=xe, y=y, yerr=sy,
                  linestyle='none', marker='.')
