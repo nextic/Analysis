@@ -15,11 +15,12 @@ def delete_lifetime_entry(filename, run_number, delimiter=" ", overwrite=False):
     in_data          = open(filename, "r").readlines()
     header, *in_data = in_data
     out_data         = list(filter(lambda line: int(line.split()[0]) != run_number, in_data))
-    if len(in_data) == len(out_data) + 1 and \
-       not overwrite and \
-       input("Overwrite value for run {} (y/n)? ".format(run_number)) != "y":
-        sys.exit(1)
-    open(filename, "w").write(header + "".join(sorted(out_data)))
+
+    if len(in_data) == len(out_data): return True
+    if overwrite or input("Overwrite value for run {} (y/n)? ".format(run_number)) == "y":
+        open(filename, "w").write(header + "".join(sorted(out_data)))
+        return True
+    return False
 
 
 def save_lifetime(  filename,
@@ -29,7 +30,8 @@ def save_lifetime(  filename,
                   comment   = "" ,
                   delimiter = " ",
                   overwrite = False):
-    delete_lifetime_entry(filename, run_number, overwrite=overwrite)
+    if not delete_lifetime_entry(filename, run_number, overwrite=overwrite):
+        return
     line = delimiter.join(map(str, [run_number,       lt,  u_lt,
                                        t_start,    t_end,    dt,
                                     date_start, date_end, ddate,
