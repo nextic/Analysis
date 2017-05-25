@@ -249,7 +249,7 @@ for run_number in run_numbers:
     #--------------------------------------------------------
     date_begin = time_from_timestamp(t_begin)
     date_end   = time_from_timestamp(t_end  )
-    date_lapse = to_deltatime(t_begin, t_end, unit="s")
+    date_lapse = to_deltatime(t_begin, t_end, unit="s", to_str=True)
 
     save_lifetime(text_filename,
                   run_number,       LT,        LTu,
