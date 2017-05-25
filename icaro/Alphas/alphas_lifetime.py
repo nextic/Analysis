@@ -30,7 +30,8 @@ parser.add_argument("-i", metavar="inputpath"  , type=str, help="input path"   )
 parser.add_argument("-o", metavar="database"   , type=str, help="database file", default="$ICARODIR/Alphas/Litetimes.txt")
 parser.add_argument("-c", metavar="comment"    , type=str, help="comments"     )
 parser.add_argument("-p", metavar="plotsfolder", type=str, help="plots folder" )
-parser.add_argument("--save-histos", action="store_true" , help="store histos" )
+parser.add_argument("--save-plots", action="store_true" , help="store control plots" )
+parser.add_argument("--overwrite" , action="store_true" , help="overwrite datebase values" )
 
 flags, extras = parser.parse_known_args(args)
 flags.i = os.path.expandvars(flags.i)
@@ -41,12 +42,15 @@ run_numbers   = flags.r
 data_filename = flags.i + "/dst_{}.root.h5"
 text_filename = flags.o
 run_comment   = flags.c
-histo_folder  = flags.p
+plots_folder  = flags.p
+save_plots    = flags.save_plots
+overwrite     = flags.overwrite
 
-def savefig(name):
-    if not flags.save_histos: return
-    if not os.path.exists(histo_folder): os.mkdir(histo_folder)
-    plt.savefig(histo_folder + "/" + name + ".png")
+def savefig(name, run_number):
+    folder = plots_folder + "/" + str(run_number)
+    if not save_plots: return
+    if not os.path.exists(folder): os.mkdir(folder)
+    plt.savefig(folder + "/" + name + ".png")
 
 for run_number in run_numbers:
     full       = dstf.load_dst(data_filename.format(run_number), "DST", "Events")
@@ -71,7 +75,7 @@ for run_number in run_numbers:
     r = np.diff(bins)[0]
     plt.xlabel("Time (min)")
     plt.ylabel("Rate (({:.1f} min)$^{{-1}}$)".format(r))
-    savefig("TriggerRate")
+    savefig("TriggerRate", run_number)
     
     rate = event_rate(full)
     print("Average trigger rate: {:.2f} evts/s".format(rate))
@@ -115,7 +119,7 @@ for run_number in run_numbers:
     plt.title('Drift time bulk')
 
     plt.tight_layout()
-    savefig("EZ_distributions")
+    savefig("EZ_distributions", run_number)
 
 
     #--------------------------------------------------------
@@ -123,7 +127,7 @@ for run_number in run_numbers:
     plt.hist2d(full.time, full.S2e, (25, 25))
     plt.xlabel("Time (s)")
     plt.ylabel("Energy (pes)");
-    savefig("EvsT")
+    savefig("EvsT", run_number)
 
 
     #--------------------------------------------------------
@@ -169,7 +173,7 @@ for run_number in run_numbers:
     plt.title('S1 vs S2')
 
     plt.tight_layout()
-    savefig("S12")
+    savefig("S12", run_number)
 
 
     #--------------------------------------------------------
@@ -204,20 +208,21 @@ for run_number in run_numbers:
     plt.title('XY distribution cathode')
 
     plt.tight_layout()
-    savefig("XY")
+    savefig("XY", run_number)
 
     
     #--------------------------------------------------------
     zrange =  50, 400
     Erange = 1e3, 7e4
     nbins  = 50
+    plt.figure()
     F, x, y, sy = profile_and_fit(fid.Z, fid.S2e, 
                                   xrange = zrange, 
                                   yrange = Erange, 
                                   nbins  = nbins, 
                                   fitpar = (50000,-300),
                                   label  = ("Drift time ($\mu$s)", "S2 energy (pes)"))
-    savefig("LifetimeFit")
+    savefig("LifetimeFit", run_number)
 
     print("Energy at Z=0: {:.0f} +- {:.0f} pes".format( F.values[0], F.errors[0]))
     print("Lifetime     : {:.1f} +- {:.1f} µs ".format(-F.values[1], F.errors[1]))
@@ -226,13 +231,14 @@ for run_number in run_numbers:
 
     
     #--------------------------------------------------------
+    plt.figure()
     dst        = fid[coref.in_range(fid.Z, *zrange)]
     timestamps = list(map(time_from_timestamp, dst.time))
     lifetime_vs_t(dst, nslices=8, timestamps=timestamps)
     plt.xlabel("Time (s)")
     plt.ylabel("Lifetime (µs)")
     plt.title("Lifetime evolution within run");
-    savefig("LifetimeT")
+    savefig("LifetimeT", run_number)
 
 
     #--------------------------------------------------------
@@ -244,5 +250,6 @@ for run_number in run_numbers:
                   run_number,       LT,        LTu,
                      t_begin,    t_end,     run_dt,
                   date_begin, date_end, date_lapse,
-                  comment="", delimiter=" ")
+                  comment   = run_comment,
+                  delimiter = " ", overwrite=overwrite)
     print("", end=space)
