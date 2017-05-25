@@ -217,8 +217,9 @@ for run_number in run_numbers:
     #--------------------------------------------------------
     zrange =  50, 400
     Erange = 1e4, 7e4
-    nbins  = 50
+    nbins  =  50
     seed   = Erange[1], zrange[1]/np.log(Erange[0]/Erange[1])
+
     plt.figure()
     F, x, y, sy = profile_and_fit(fid.Z, fid.S2e, 
                                   xrange = zrange, 
