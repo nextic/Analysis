@@ -1,4 +1,4 @@
-# An script to compute alpha lifetime.
+# A script to compute alpha lifetime.
 import os
 import sys
 import argparse
@@ -17,7 +17,9 @@ from icaro.core.kdst_functions import to_deltatime
 from icaro.core.kdst_functions import lifetime_vs_t
 from icaro.core.kdst_functions import save_lifetime
 
-plt.rcParams["figure.figsize"] = 10, 8
+plt.rcParams["figure.figsize"]          = 10, 8
+plt.rcParams["figure.max_open_warning"] = 1000
+
 space = "\n.\n.\n.\n"
 print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), end=space)
 
@@ -214,9 +216,9 @@ for run_number in run_numbers:
     
     #--------------------------------------------------------
     zrange =  50, 400
-    Erange = 1e3, 7e4
+    Erange = 1e4, 7e4
     nbins  = 50
-    seed   = Erange[1], np.log(Erange[0]/Erange[1])/zrange[1]
+    seed   = Erange[1], zrange[1]/np.log(Erange[0]/Erange[1])
     plt.figure()
     F, x, y, sy = profile_and_fit(fid.Z, fid.S2e, 
                                   xrange = zrange, 
