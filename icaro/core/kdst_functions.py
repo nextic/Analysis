@@ -5,7 +5,7 @@ import pandas as pd
 import invisible_cities.core.fit_functions as fitf
 from   invisible_cities.core.system_of_units_c import units
 from   invisible_cities.core.mpl_functions import set_plot_labels
-from invisible_cities.core.core_functions import in_range
+from   invisible_cities.core.core_functions import in_range
 import matplotlib.pyplot as plt
 from   collections import namedtuple
 import datetime
@@ -14,11 +14,11 @@ import datetime
 def delete_lifetime_entry(filename, run_number, delimiter=" ", overwrite=False):
     in_data          = open(filename, "r").readlines()
     header, *in_data = in_data
-    out_data         = list(filter(lambda line: int(line.split()[0]) != run_number, in_data))
+    out_data         = list(filter(lambda line: int(line.split(delimiter)[0]) != run_number, in_data))
 
     if len(in_data) == len(out_data): return True
     if overwrite or input("Overwrite value for run {} (y/n)? ".format(run_number)) == "y":
-        open(filename, "w").write(header + "".join(sorted(out_data)))
+        open(filename, "w").write(header + "".join(out_data))
         return True
     return False
 
@@ -36,7 +36,12 @@ def save_lifetime(  filename,
                                        t_start,    t_end,    dt,
                                     date_start, date_end, ddate,
                                     comment]))
-    open(filename, "a").write(line + "\n")
+    in_data          = open(filename, "r").readlines()
+    in_data.append(line + "\n")
+
+    header, *in_data = in_data
+    out_data         = sorted(in_data, key=lambda x: int(x.split(delimiter)[0]))
+    open(filename, "w").write(header + "".join(out_data))
 
     
 def load_lifetimes(filename, delimiter=" "):
