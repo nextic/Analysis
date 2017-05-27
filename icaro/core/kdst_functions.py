@@ -40,6 +40,7 @@ def save_lifetime(  filename,
     in_data.append(line + "\n")
 
     header, *in_data = in_data
+    in_data          = filter(lambda x: not x.isspace(), in_data)
     out_data         = sorted(in_data, key=lambda x: int(x.split(delimiter)[0]))
     open(filename, "w").write(header + "".join(out_data))
 
