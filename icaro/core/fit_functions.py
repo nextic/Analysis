@@ -16,6 +16,7 @@ def conditional_labels(with_title=True):
     without_ = lambda *args: labels(*args[:2], "")
     return with_ if with_title else without_
 
+
 def gauss_seed(x, y, sigma_rel=0.05):
     """
     Estimate the seed for a gaussian fit to the input data.
@@ -198,7 +199,7 @@ def fit_slices_2d_gauss(xdata, ydata, zdata, xbins, ybins, zbins, min_entries=1e
                 valid [i, j] = True
             except:
                 pass
-        return Measurement(mean, meanu), Measurement(sigma, sigmau), chi2, valid
+    return Measurement(mean, meanu), Measurement(sigma, sigmau), chi2, valid
 
 
 def fit_slices_2d_expo(xdata, ydata, zdata, tdata,
