@@ -185,7 +185,7 @@ def fit_slices_2d_gauss(xdata, ydata, zdata, xbins, ybins, zbins, min_entries=1e
     for i in range(nbins_x):
         sel_x = in_range(xdata, *xbins[i:i + 2])
         for j in range(nbins_y):
-            sel_y = in_range(ydata, *ybins[i:i + 2])
+            sel_y = in_range(ydata, *ybins[j:j + 2])
             sel   = sel_x & sel_y
             if np.count_nonzero(sel) < min_entries: continue
 
