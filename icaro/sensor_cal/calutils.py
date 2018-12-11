@@ -3,7 +3,7 @@ import tables as tb
 
 import matplotlib.pyplot as plt
 
-from invisible_cities.core.core_functions import weighted_mean_and_var
+from invisible_cities.core.core_functions import weighted_mean_and_std
 
 import invisible_cities.database.load_db   as DB
 
@@ -45,6 +45,8 @@ def sipm_connectivity_check(elec_name, dark_name, run_no):
     with tb.open_file(elec_name, 'r') as eFile, \
          tb.open_file(dark_name, 'r') as dFile:
 
+        check_all_present(dFile)
+
         min_incr = 0.5
 
         try:
@@ -66,8 +68,8 @@ def sipm_connectivity_check(elec_name, dark_name, run_no):
 
             for sipm, espec, dspec in zip(sensors, specsE, specsD):
 
-                avE, rmsE = weighted_mean_and_var(binsE, espec, unbiased=True)
-                avD, rmsD = weighted_mean_and_var(binsD, dspec, unbiased=True)
+                avE, rmsE = weighted_mean_and_std(binsE, espec, unbiased=True)
+                avD, rmsD = weighted_mean_and_std(binsD, dspec, unbiased=True)
 
                 mean_low   = avE + min_incr >= avD
                 rms_low    = rmsE + min_incr >= rmsD
@@ -132,6 +134,9 @@ def sipm_rms_check(wf_file):
 
     with tb.open_file(wf_file, 'r') as data:
 
+        ## First make sure all the DICE are sending data
+        check_all_present(data)
+
         bad_log = {}
 
         try:
@@ -174,5 +179,26 @@ def sipm_rms_check(wf_file):
         print('bad channel summary')
         for key, evts in bad_log.items():
             print('Event ', key, ' channels ', evts)
+
+
+def check_all_present(data_file):
+    """
+    Checks data file to make sure no SiPMs are missing
+    """
+    sensors = np.fromiter((sens[1] for sens in data_file.root.Sensors.DataSiPM),
+                          np.int)
+    try:
+        sipmrwf    = np.sum(getattr(data_file.root, 'RD/sipmrwf'), 0)
+        all_zeros  = np.count_nonzero(sipmrwf, 1) == 0
+        if len(sensors[all_zeros]) != 0:
+            print('Zeros detected, possible missing DICE')
+            print(sensors[all_zeros])
+    except tb.NoSuchNodeError:
+        sipmbins   = np.array(getattr(data_file.root, 'HIST/sipm_spe_bins'))
+        sipmhistos = np.sum(getattr(data_file.root, 'HIST/sipm_spe'), 0)
+        rms_values = np.fromiter((weighted_mean_and_std(sipmbins, hist, unbiased=True)[1] for hist in sipmhistos), np.float)
+        if len(sensors[rms_values == 0]) != 0:
+            print('Zeros detected, possible missing DICE')
+            print(sensors[rms_values == 0])
 
                 
